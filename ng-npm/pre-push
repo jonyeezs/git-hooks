@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# An example hook script to verify what is about to be pushed.  Called by "git
+# push" after it has checked the remote status, but before anything has been
+# pushed.  If this script exits with a non-zero status nothing will be pushed.
+#
+# This will run your unit test and sets the exit code base on failure or success
+# 
+# It will hide your unit test report and a regex is required to display the 
+# line from the report, that would summarize your unit test result.
+#
+# This hook is called with the following parameters:
+# 1. the unit test executable
+# 2. line regex of the test summary
+
+run_test() {
+    report=$($1)
+    result=$?
+    echo "$report" | grep --color=auto "$2"
+    exit $result
+}
+
+echo -e "\e[33mRunning test before pushing...\e[0m"
+
+run_test "gulp unit" "Executed [0-9].* of [0-9].*"

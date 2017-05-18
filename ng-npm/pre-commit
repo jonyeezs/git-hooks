@@ -1,0 +1,39 @@
+#!/bin/sh
+#
+# Hook to stop commits if any debug code is left behind
+#
+# As well it prevents focus specs to be added
+#
+# This hook has two functions:
+# 1. check for debug lines
+# 2. check for focused specs
+#
+# Both function expects two parameters:
+# 1. the file type
+# 2. the regex to look for
+#
+# FIXME: the check_debug for some reason can't diff on the parameter ¯\_(ツ)_/¯
+
+EXIT_VALUE=0
+
+check_debug() {
+    debug_result="$(git diff --cached "**.js" | egrep "^\+" | grep -E $2)"
+    if [ ! -z "$debug_result" ]; then
+        echo -e "\e[31m\tWarning, the commit contains debug code. Please remove before commiting.\e[0m"
+        EXIT_VALUE=1
+    fi
+}
+
+check_fspec() {
+    fspec_result="$(git diff --cached $1 | egrep "^\+" | grep -E $2)"
+    if [ ! -z "$fspec_result" ]; then
+        echo -e "\e[31m\tWarning, the commit contains focused specs. Please fix this before commiting.\e[0m"
+        EXIT_VALUE=1
+    fi    
+}
+
+check_debug **.js "(debugger)"
+
+check_fspec *.spec.js "(fdescribe|fit|fcontext)"
+
+exit $EXIT_VALUE

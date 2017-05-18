@@ -1,0 +1,44 @@
+#!/bin/sh
+# https://gist.github.com/akfish/8435506
+
+# Called by "git push" after it has checked the remote status, but before anything
+# has been pushed.  If this script exits with a non-zero status nothing will be pushed.
+#
+# This will run msbuild and nunit to ensure your app can be run and test are successful
+#
+# Pre-requisite:
+# 1. Install nunit3-console (https://github.com/nunit/nunit-console/releases/tag/3.5)
+#
+# Please update the project details below to reflect your project and its build paths
+#
+# (TODO would like to supress the output and summarize it)
+
+# Path To MSBuild.exe
+MSBuild="/c/Windows/Microsoft.NET/Framework/v4.0.30319/MSBuild.exe"
+# Path To nunit3-console.exe
+NunitCli="/c/Program\ Files\ \(x86\)/NUnit.org/nunit-console/nunit3-console.exe"
+
+ProjectRoot="$(git rev-parse --show-toplevel)"
+
+safeRunCommand() {
+    typeset cmd="$*"
+    typeset ret_code
+
+    eval $cmd
+
+    ret_code=$?
+
+    if [ $ret_code != 0 ]; then
+        exit $ret_code
+    fi
+}
+
+# Build
+ProjectSolution="src/GSF.CertificateStore.sln"
+echo -e "\e[33mValidating build...\e[0m"
+safeRunCommand $MSBuild $ProjectRoot/$ProjectSolution
+
+# Test
+TestsContainer="src/**/bin/*/*.*.Tests.dll"
+echo -e "\e[33mRunning test before pushing...\e[0m"
+safeRunCommand $NunitCli $ProjectRoot/$TestsContainer "--stoponerror --noresult --trace=Off --labels=Off --noh"

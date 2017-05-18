@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# git hook to run a command after `git pull` if a specified file was changed
+# Run `chmod +x post-merge` to make it executable then put it into `.git/hooks/`.
+#
+# This will check for modified or added lines.
+# If there are new lines we want to run the primary command
+# If there are modification we want to run the secondary command
+#
+# This hook is called with the following parameters:
+# 1. the file to watch
+# 2. primary command for when code is added
+# 3. secondary command for when code is modified
+
+MOD_PATTERN='^.+(\[-|\{\+).*$'
+ADD_PATTERN='^\{\+.*\+\}$'
+REM_PATTERN='^\[-.*-\]$'
+
+NPM_DEPENDENCIES_FOLDER='node_modules'
+
+ check_run() {
+    changed_files="$(git diff --word-diff --unified=0 ORIG_HEAD HEAD $1 | sed -nr \
+        -e "s/$MOD_PATTERN/modified/p" \
+        -e "s/$ADD_PATTERN/added/p" \
+        -e "s/$REM_PATTERN/removed/p" \
+        | sort | uniq -c)"
+
+    echo "$changed_files" | grep --quiet "added" && echo -e "\e[33mFound new lines in \e[1m$1\e[0m. Running \e[7mnpm install\e[0m" && eval "$2"
+    echo "$changed_files" | grep --quiet "modified" && echo -e "\e[33mFound modified lines in \e[1m$1\e[0m. Running \e[7mnpm update\e[0m" && eval "$3"
+ }
+
+if [ ! -d "$NPM_DEPENDENCIES_FOLDER" ]; then
+    echo -e "\e[33mNo $NPM_DEPENDENCIES_FOLDER folder found\e[0m. Running \e[7mnpm install\e[0m"
+    npm install
+else    
+    check_run package.json "npm install" "npm update"
+fi
