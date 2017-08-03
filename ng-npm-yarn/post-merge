@@ -9,14 +9,26 @@
 #
 # This hook is called with the following parameters:
 # 1. the file to watch
-# 2. primary command for when code is added
-# 3. secondary command for when code is modified
-
+# 2. command to
+#
+# This works for NPM v5 and later and yarn.
+# Yarn takes higher precedence than NPM. Reason: uh...you purposefully used yarn..??
+#
+# This will update base on the package lock file
+#
 MOD_PATTERN='^.+(\[-|\{\+).*$'
 ADD_PATTERN='^\{\+.*\+\}$'
 REM_PATTERN='^\[-.*-\]$'
 
 NPM_DEPENDENCIES_FOLDER='node_modules'
+
+if [ -e yarn.lock ]; then
+    LOCK_FILE='yarn.lock'
+    PM_CMD='yarn'
+else
+    LOCK_FILE='package-lock.json'
+    PM_CMD='npm install'
+fi
 
  check_run() {
     changed_files="$(git diff --word-diff --unified=0 ORIG_HEAD HEAD $1 | sed -nr \
@@ -25,13 +37,13 @@ NPM_DEPENDENCIES_FOLDER='node_modules'
         -e "s/$REM_PATTERN/removed/p" \
         | sort | uniq -c)"
 
-    echo "$changed_files" | grep --quiet "added" && echo -e "\e[33mFound new lines in \e[1m$1\e[0m. Running \e[7mnpm install\e[0m" && eval "$2"
-    echo "$changed_files" | grep --quiet "modified" && echo -e "\e[33mFound modified lines in \e[1m$1\e[0m. Running \e[7mnpm update\e[0m" && eval "$3"
+    echo "$changed_files" | grep --quiet "added" && echo -e "\e[33mFound new lines in \e[1m$1\e[0m. Running \e[7m$2\e[0m" && eval "$2"
+    echo "$changed_files" | grep --quiet "modified" && echo -e "\e[33mFound modified lines in \e[1m$1\e[0m. Running \e[7m$2\e[0m" && eval "$2"
  }
 
 if [ ! -d "$NPM_DEPENDENCIES_FOLDER" ]; then
-    echo -e "\e[33mNo $NPM_DEPENDENCIES_FOLDER folder found\e[0m. Running \e[7mnpm install\e[0m"
-    npm install
-else    
-    check_run package.json "npm install" "npm update"
+    echo -e "\e[33mNo $NPM_DEPENDENCIES_FOLDER folder found\e[0m. Running \e[7m$PM_CMD\e[0m"
+    eval "$PM_CMD"
+else
+    check_run $LOCK_FILE $PM_CMD
 fi

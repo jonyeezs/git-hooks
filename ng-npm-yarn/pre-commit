@@ -6,7 +6,7 @@
 #
 # This hook has two functions:
 # 1. check for debug lines
-# 2. check for focused specs
+# 2. check for focused specs (looks for .spec.js. Rename line 37 if your test files have a different convention)
 #
 # Both function expects two parameters:
 # 1. the file type
