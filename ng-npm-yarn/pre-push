@@ -13,7 +13,7 @@
 # 1. the unit test executable
 # 2. line regex of the test summary
 
-TEST_CMD='gulp unit'
+TEST_CMD="gulp unit"
 
 run_test() {
     report=$($1)
@@ -24,4 +24,4 @@ run_test() {
 
 echo -e "\e[33mRunning test before pushing...\e[0m"
 
-run_test $TEST_CMD "Executed [0-9].* of [0-9].*"
+run_test "${TEST_CMD}" "Executed [0-9].* of [0-9].*"

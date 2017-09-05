@@ -45,5 +45,5 @@ if [ ! -d "$NPM_DEPENDENCIES_FOLDER" ]; then
     echo -e "\e[33mNo $NPM_DEPENDENCIES_FOLDER folder found\e[0m. Running \e[7m$PM_CMD\e[0m"
     eval "$PM_CMD"
 else
-    check_run $LOCK_FILE $PM_CMD
+    check_run "${LOCK_FILE}" "${PM_CMD}"
 fi

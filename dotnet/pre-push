@@ -34,11 +34,11 @@ safeRunCommand() {
 }
 
 # Build
-ProjectSolution="src/GSF.CertificateStore.sln"
+ProjectSolution="<solutionlocation>.sln"
 echo -e "\e[33mValidating build...\e[0m"
-safeRunCommand $MSBuild $ProjectRoot/$ProjectSolution
+safeRunCommand "${MSBuild}" "${ProjectRoot}/${ProjectSolution}"
 
 # Test
 TestsContainer="src/**/bin/*/*.*.Tests.dll"
 echo -e "\e[33mRunning test before pushing...\e[0m"
-safeRunCommand $NunitCli $ProjectRoot/$TestsContainer "--stoponerror --noresult --trace=Off --labels=Off --noh"
+safeRunCommand "${NunitCli}" "${ProjectRoot}/${TestsContainer}" "--stoponerror --noresult --trace=Off --labels=Off --noh"
