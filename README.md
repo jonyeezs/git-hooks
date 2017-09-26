@@ -10,7 +10,7 @@ Useful [hooks](https://www.atlassian.com/git/tutorials/git-hooks) in for your gi
 
 ### On a new git project
 
-`cp -R {dir-of-git-hooks}\{language-specific-hook-folder-in-git-hooks}\ {dir-of-your-git-project}\.git\hooks\`
+`cp -R {dir-of-git-hooks}\{language-specific-hook-folder-in-git-hooks}\* {dir-of-your-git-project}\.git\hooks\`
 
 ### Copy specific file to your git project hooks folder
 
