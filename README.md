@@ -16,7 +16,6 @@ Useful [hooks](https://www.atlassian.com/git/tutorials/git-hooks) in for your gi
 
 `cp {dir-of-git-hooks}\{language-specific-hook-folder-in-git-hooks}\post-merge {dir-of-your-git-project}\.git\hooks\`
 
-
 ## Goals
 
 1. Save devs from forgetting to DoD their code before pushing to remote.
@@ -39,3 +38,13 @@ Useful [hooks](https://www.atlassian.com/git/tutorials/git-hooks) in for your gi
   * Runs important process that would not make your commit unusable or broken
   * Good where you need to run long processes
   * Best time to run your test or notifications
+  
+
+### Caveats
+
+#### dotnet
+* runs test before pushing (FIXME: still bit buggy)
+  * work around ensure you build the project first before pushing
+  
+#### npm-yarn
+* mileage may vary for the commands and file regex used. Change it to suit your settings.
