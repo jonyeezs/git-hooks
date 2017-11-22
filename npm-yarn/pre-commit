@@ -5,8 +5,9 @@
 # As well it prevents focus specs to be added
 #
 # This hook has two functions:
-# 1. check for debug lines
-# 2. check for focused specs (looks for .spec.js. Rename line 37 if your test files have a different convention)
+# 1. check for lint issues (You'll have to fix it on your own)
+# 2. check for debug lines
+# 3. check for focused specs (looks for .spec.js. Rename line 37 if your test files have a different convention)
 #
 # Both function expects two parameters:
 # 1. the file type
@@ -15,6 +16,14 @@
 # FIXME: the check_debug for some reason can't diff on the parameter ¯\_(ツ)_/¯
 
 EXIT_VALUE=0
+
+LINT_CMD="ng lint --format stylish"
+run_lint() {
+    report=$($1)
+    result=$?
+    echo "$report"
+    exit $result
+}
 
 check_debug() {
     debug_result="$(git diff --cached "**.js" | egrep "^\+" | grep -E $2)"
@@ -31,6 +40,8 @@ check_fspec() {
         EXIT_VALUE=1
     fi    
 }
+
+run_lint "${LINT_CMD}"
 
 check_debug **.js "(debugger)"
 
