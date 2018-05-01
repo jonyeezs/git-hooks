@@ -13,15 +13,15 @@
 # 1. the unit test executable
 # 2. line regex of the test summary
 
-TEST_CMD="gulp unit"
+TEST_CMD="npx ng test --single-run --sm=false --log-level=error"
 
 run_test() {
     report=$($1)
     result=$?
-    echo "$report" | grep --color=auto "$2"
+    echo "$report" | grep "$2"
     exit $result
 }
 
-echo -e "\e[33mRunning test before pushing...\e[0m"
+echo -e "\033[0;33m\tRunning test before pushing...\033[0m"
 
 run_test "${TEST_CMD}" "Executed [0-9].* of [0-9].*"

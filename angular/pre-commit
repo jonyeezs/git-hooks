@@ -17,7 +17,7 @@
 
 EXIT_VALUE=0
 
-LINT_CMD="ng lint --format stylish"
+LINT_CMD="npx ng lint --format stylish"
 run_lint() {
     report=$($1)
     result=$?
@@ -26,9 +26,10 @@ run_lint() {
 }
 
 check_debug() {
-    debug_result="$(git diff --cached "**.js" | egrep "^\+" | grep -E $2)"
+    debug_result="$(git diff --cached "**.js" "**.ts" | egrep "^\+" | grep -E $1)"
+    echo "$debug_result"
     if [ ! -z "$debug_result" ]; then
-        echo -e "\e[31m\tWarning, the commit contains debug code. Please remove before commiting.\e[0m"
+        echo -e "\033[0;31m\tWarning, the commit contains debug code. Please remove before commiting.\033[0m"
         EXIT_VALUE=1
     fi
 }
@@ -36,15 +37,18 @@ check_debug() {
 check_fspec() {
     fspec_result="$(git diff --cached $1 | egrep "^\+" | grep -E $2)"
     if [ ! -z "$fspec_result" ]; then
-        echo -e "\e[31m\tWarning, the commit contains focused specs. Please fix this before commiting.\e[0m"
+        echo -e "\033[0;31m\tWarning, the commit contains focused specs. Please fix this before commiting.\033[0m"
         EXIT_VALUE=1
     fi    
 }
 
+check_debug "(debugger|console)"
+check_fspec *.spec.ts "(fdescribe|fit|fcontext)"
+
+if [ "$EXIT_VALUE" != 0 ]; then
+    exit $EXIT_VALUE
+fi
+
 run_lint "${LINT_CMD}"
-
-check_debug **.js "(debugger)"
-
-check_fspec *.spec.js "(fdescribe|fit|fcontext)"
 
 exit $EXIT_VALUE
