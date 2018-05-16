@@ -31,14 +31,22 @@ else
 fi
 
  check_run() {
+    has_changes=1
+     
     changed_files="$(git diff --word-diff --unified=0 ORIG_HEAD HEAD $1 | sed -nr \
         -e "s/$MOD_PATTERN/modified/p" \
         -e "s/$ADD_PATTERN/added/p" \
         -e "s/$REM_PATTERN/removed/p" \
         | sort | uniq -c)"
 
-    echo "$changed_files" | grep --quiet "added" && echo -e "\e[33mFound new lines in \e[1m$1\e[0m. Running \e[7m$2\e[0m" && eval "$2"
-    echo "$changed_files" | grep --quiet "modified" && echo -e "\e[33mFound modified lines in \e[1m$1\e[0m. Running \e[7m$2\e[0m" && eval "$2"
+    echo "$changed_files" | grep --quiet "added" && echo -e "\e[33mFound new lines in \e[1m$1\e[0m. Running \e[7m$2\e[0m" && has_changes=1
+    echo "$changed_files" | grep --quiet "modified" && echo -e "\e[33mFound modified lines in \e[1m$1\e[0m." && has_changes=1
+    
+    
+    if [[ $has_changes -eq 1 ]]; then
+        echo "Running \e[7m$2\e[0m"
+        eval "$2"
+    fi
  }
 
 if [ ! -d "$NPM_DEPENDENCIES_FOLDER" ]; then
